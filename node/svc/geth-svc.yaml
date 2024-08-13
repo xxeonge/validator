@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geth-svc
+  labels:
+    app: validator
+spec:
+  type: ClusterIP
+  ports:
+    - port: 30303
+      targetPort: 30303
+      protocol: TCP
+      name: p2p-tcp
+    - port: 30303
+      targetPort: 30303
+      protocol: UDP
+      name: p2p-udp
+    - port: 8545
+      targetPort: 8545
+      protocol: TCP
+      name: http-rpc
+    - port: 8545
+      targetPort: 8545
+      protocol: TCP
+      name: ws-rpc
+    - port: 8551
+      targetPort: 8551
+      protocol: TCP
+      name: auth-rpc
+    - port: 6060
+      targetPort: 6060
+      protocol: TCP
+      name: metrics

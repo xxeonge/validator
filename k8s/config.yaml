@@ -7,4 +7,4 @@ data:
   BEACON_ENDPOINTS: "https://ethereum-beacon.blockpi.network/rpc/v1/c3355b1800394ac77408942833bb5040914f46cd"
   FEE_RECIPIENT: "0xd0a761D68bee560F6FadB18cc2254f09cdAEC042"
   MEV_BOOST_RPC: "http://mev-boost-rpc:18550"
-  EXECUTION_ENDPOINT: "http://10.244.0.68:8551"
+  EXECUTION_ENDPOINT: "http://geth-svc:8551"

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lighthouse-beacon
+  name: beacon
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lighthouse-beacon
+      app: beacon
   template:
     metadata:
       labels:
-        app: lighthouse-beacon
+        app: beacon
     spec:
       containers:
-        - name: lighthouse-beacon
+        - name: beacon
           image: sigp/lighthouse:latest-modern
           ports:
             - name: http
@@ -45,7 +45,7 @@ spec:
             - --metrics-address=0.0.0.0
             - --metrics-port=5053
             - --suggested-fee-recipient=$(FEE_RECIPIENT)
-            - --execution-endpoint=http://10.244.0.68:8551
+            - --execution-endpoint=$(EXECUTION_ENDPOINT)
             - --execution-jwt=/root/.lighthouse/jwtsecret
             - --prune-payloads=false
             - --checkpoint-sync-url=https://beaconstate.ethstaker.cc
@@ -72,7 +72,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: lighthouse-beacon
+  name: beacon
 spec:
   ports:
     - name: http
@@ -85,4 +85,4 @@ spec:
       port: 9000
       targetPort: 9000
   selector:
-    app: lighthouse-beacon
+    app: beacon

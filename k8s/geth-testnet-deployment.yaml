@@ -53,6 +53,13 @@ spec:
             - --authrpc.port=8551
             - --authrpc.vhosts=*
             - --authrpc.jwtsecret=/.holesky/jwtsecret
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2Gi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
           livenessProbe:
             tcpSocket:
               port: 8551

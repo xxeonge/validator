@@ -53,8 +53,13 @@ spec:
             - --prune-payloads=false
             - --checkpoint-sync-url=https://holesky.beaconstate.ethstaker.cc/
             - --purge-db
-            - --port=9000
-            - --discovery-port=9000
+          resources:
+            requests:
+              cpu: "2"
+              memory: "3Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
           volumeMounts:
             - name: lighthouse-data
               mountPath: /root/.lighthouse

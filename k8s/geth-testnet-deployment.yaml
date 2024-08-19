@@ -53,6 +53,18 @@ spec:
             - --authrpc.port=8551
             - --authrpc.vhosts=*
             - --authrpc.jwtsecret=/.holesky/jwtsecret
+          livenessProbe:
+            tcpSocket:
+              port: 8551
+            initialDelaySeconds: 5  
+            periodSeconds: 5         
+            failureThreshold: 2    
+          readinessProbe:
+            tcpSocket:
+              port: 8551
+            initialDelaySeconds: 5  
+            periodSeconds: 5         
+            failureThreshold: 2 
       volumes:
         - name: geth-data
           hostPath:
@@ -81,6 +93,10 @@ spec:
     - name: p2p
       port: 30303
       targetPort: 30303
+    - name: p2p-udp
+      port: 30303
+      targetPort: 30303
+      protocol: UDP
     - name: metrics
       port: 6060
       targetPort: 6060

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lighthouse-validator
+  name: validator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lighthouse-validator
+      app: validator
   template:
     metadata:
       labels:
-        app: lighthouse-validator
+        app: validator
     spec:
       containers:
-        - name: lighthouse-validator
+        - name: validator
           image: sigp/lighthouse:latest-modern
           ports:
             - name: http
@@ -69,7 +69,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: lighthouse-validator
+  name: validator
 spec:
   ports:
     - name: http
@@ -79,4 +79,4 @@ spec:
       port: 5064
       targetPort: 5064
   selector:
-    app: lighthouse-validator
+    app: validator

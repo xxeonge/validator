@@ -3,6 +3,7 @@ kind: StatefulSet
 metadata:
   name: validator
 spec:
+  serviceName: "validator"
   replicas: 1
   selector:
     matchLabels:
@@ -15,11 +16,6 @@ spec:
       containers:
         - name: validator
           image: sigp/lighthouse:latest-modern
-          # ports:
-          #   - name: http
-          #     containerPort: 5062
-          #   - name: metrics
-          #     containerPort: 5064
           envFrom:
             - configMapRef:
                 name: lighthouse-config
@@ -48,24 +44,20 @@ spec:
             - --graffiti=$(GRAFFITI)
           volumeMounts:
             - name: lighthouse-data
-              mountPath: /root/.lighthouse
-              # persistentVolumeClaim:
-              #   claimName: lb-pvc
+              mountPath: /root/.lighthouse/validator
             - name: validator-keys
               mountPath: /root/validator_keys
-              # persistentVolumeClaim:
-              #   claimName: validator-keys-pvc
             - name: jwt-secret
               mountPath: /.holesky/jwtsecret
               subPath: jwt-secret
               readOnly: true
       volumes:
         - name: lighthouse-data
-          hostPath:
-            path: /Users/sia/lv-data  # 호스트에서 이 경로가 존재하는지 확인
+          persistentVolumeClaim:
+            claimName: lv-pvc
         - name: validator-keys
-          hostPath:
-            path: /keys/validator_keys  # 호스트에서 이 경로가 존재하는지 확인
+          persistentVolumeClaim:
+            claimName: validator-keys-pvc 
         - name: jwt-secret
           secret:
             secretName: geth-jwt-secret

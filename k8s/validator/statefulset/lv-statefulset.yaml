@@ -51,16 +51,31 @@ spec:
               mountPath: /.holesky/jwtsecret
               subPath: jwt-secret
               readOnly: true
-      volumes:
-        - name: lighthouse-data
-          persistentVolumeClaim:
-            claimName: lv-pvc
-        - name: validator-keys
-          persistentVolumeClaim:
-            claimName: validator-keys-pvc 
-        - name: jwt-secret
-          secret:
-            secretName: geth-jwt-secret
+      volumeClaimTemplates:
+        - metadata:
+            name: lighthouse-data
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+            storageClassName: standard
+        - metadata:
+            name: validator-keys
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 5Gi
+            storageClassName: standard
+        - metadata:
+            name: jwt-secret
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 1Gi
+            storageClassName: standard
 ---
 apiVersion: v1
 kind: Service

@@ -56,23 +56,30 @@ spec:
               memory: "8Gi"
           volumeMounts:
             - name: lighthouse-data
-              mountPath: /root/.lighthouse
+              mountPath: /root/.lighthouse/beacon
             - name: validator-keys
               mountPath: /root/validator_keys
             - name: jwt-secret
               mountPath: /.holesky/jwtsecret
               subPath: jwt-secret
               readOnly: true
-      volumes:
-        - name: lighthouse-data
-          persistentVolumeClaim:
-            claimName: lb-pvc
-        - name: validator-keys
-          persistentVolumeClaim:
-            claimName: validator-keys-pvc
-        - name: jwt-secret
-          secret:
-            secretName: geth-jwt-secret
+      volumeClaimTemplates:
+        - metadata:
+            name: lighthouse-data
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+            storageClassName: standard
+        - metadata:
+            name: validator-keys
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 256Gi
+            storageClassName: standard
 ---
 apiVersion: v1
 kind: Service

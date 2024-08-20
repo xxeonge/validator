@@ -74,12 +74,18 @@ spec:
             periodSeconds: 5
             failureThreshold: 2
       volumes:
-        - name: geth-data
-          persistentVolumeClaim:
-            claimName: geth-pvc
         - name: jwt-secret
           secret:
             secretName: geth-jwt-secret
+      volumeClaimTemplates:
+        - metadata:
+            name: geth-data
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 1500Gi
+            storageClassName: standard
 
 ---
 apiVersion: v1

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: geth-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1500Gi # 필요한 스토리지 용량을 지정합니다. (예: 10Gi)
+  storageClassName: standard # 사용할 스토리지 클래스의 이름을 지정합니다.

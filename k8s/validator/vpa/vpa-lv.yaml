@@ -17,4 +17,4 @@ spec:
         memory: 3Gi
       maxAllowed:
         cpu: 4
-        memory: 8Gi
+        memory: 10Gi

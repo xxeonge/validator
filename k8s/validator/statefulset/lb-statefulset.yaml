@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: beacon
+spec:
+  serviceName: "beacon"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beacon
+  template:
+    metadata:
+      labels:
+        app: beacon
+    spec:
+      containers:
+        - name: beacon
+          image: sigp/lighthouse:latest-modern
+          envFrom:
+            - configMapRef:
+                name: lighthouse-config
+          env:
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: geth-jwt-secret
+                  key: jwt-secret
+          command:
+            - lighthouse
+          args:
+            - --network
+            - holesky
+            - beacon
+            - --datadir
+            - /root/.lighthouse
+            - --staking
+            - --validator-monitor-auto
+            - --http
+            - --http-address=0.0.0.0
+            - --http-port=5052
+            - --metrics
+            - --metrics-address=0.0.0.0
+            - --metrics-port=5053
+            - --suggested-fee-recipient=$(FEE_RECIPIENT)
+            - --execution-endpoint=$(EXECUTION_ENDPOINT)
+            - --execution-jwt=/.holesky/jwtsecret
+            - --prune-payloads=false
+            - --checkpoint-sync-url=https://holesky.beaconstate.ethstaker.cc/
+            - --purge-db
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+          volumeMounts:
+            - name: lighthouse-data
+              mountPath: /root/.lighthouse
+            - name: validator-keys
+              mountPath: /root/validator_keys
+            - name: jwt-secret
+              mountPath: /.holesky/jwtsecret
+              subPath: jwt-secret
+              readOnly: true
+      volumes:
+        - name: lighthouse-data
+          persistentVolumeClaim:
+            claimName: lb-pvc
+        - name: validator-keys
+          persistentVolumeClaim:
+            claimName: validator-keys-pvc
+        - name: jwt-secret
+          secret:
+            secretName: geth-jwt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon
+spec:
+  ports:
+    - name: http
+      port: 5052
+      targetPort: 5052
+    - name: metrics
+      port: 5053
+      targetPort: 5053
+    - name: p2p
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: beacon

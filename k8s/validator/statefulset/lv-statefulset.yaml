@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: validator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validator
+  template:
+    metadata:
+      labels:
+        app: validator
+    spec:
+      containers:
+        - name: validator
+          image: sigp/lighthouse:latest-modern
+          # ports:
+          #   - name: http
+          #     containerPort: 5062
+          #   - name: metrics
+          #     containerPort: 5064
+          envFrom:
+            - configMapRef:
+                name: lighthouse-config
+          env:
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: geth-jwt-secret
+                  key: jwt-secret
+          command:
+            - lighthouse
+          args:
+            - --network
+            - holesky
+            - validator_client
+            - --datadir
+            - /root/.lighthouse
+            - --beacon-nodes=$(BEACON_ENDPOINTS)
+            - --http
+            - --http-port=5062
+            - --metrics
+            - --metrics-address=0.0.0.0
+            - --metrics-port=5064
+            - --suggested-fee-recipient=$(FEE_RECIPIENT)
+            - --builder-proposals
+            - --graffiti=$(GRAFFITI)
+          volumeMounts:
+            - name: lighthouse-data
+              mountPath: /root/.lighthouse
+              # persistentVolumeClaim:
+              #   claimName: lb-pvc
+            - name: validator-keys
+              mountPath: /root/validator_keys
+              # persistentVolumeClaim:
+              #   claimName: validator-keys-pvc
+            - name: jwt-secret
+              mountPath: /.holesky/jwtsecret
+              subPath: jwt-secret
+              readOnly: true
+      volumes:
+        - name: lighthouse-data
+          hostPath:
+            path: /Users/sia/lv-data  # 호스트에서 이 경로가 존재하는지 확인
+        - name: validator-keys
+          hostPath:
+            path: /keys/validator_keys  # 호스트에서 이 경로가 존재하는지 확인
+        - name: jwt-secret
+          secret:
+            secretName: geth-jwt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: validator
+spec:
+  ports:
+    - name: http
+      port: 5062
+      targetPort: 5062
+    - name: metrics
+      port: 5064
+      targetPort: 5064
+  selector:
+    app: validator

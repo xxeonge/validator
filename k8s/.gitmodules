@@ -1,3 +1,0 @@
-[submodule "k8s/autoscaler"]
-	path = k8s/autoscaler
-	url = https://github.com/kubernetes/autoscaler.git

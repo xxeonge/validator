@@ -1,17 +1,17 @@
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
-  name: lighthouse-vpa
+  name: lv-vpa
 spec:
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: beacon
+    name: validator
   updatePolicy:
     updateMode: "Auto"
   resourcePolicy:
     containerPolicies:
-    - containerName: beacon
+    - containerName: validator
       minAllowed:
         cpu: 2
         memory: 3Gi

@@ -77,15 +77,9 @@ spec:
         - name: jwt-secret
           secret:
             secretName: geth-jwt-secret
-      volumeClaimTemplates:
-        - metadata:
-            name: geth-data
-          spec:
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 1500Gi
-            storageClassName: standard
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-pvc
 
 ---
 apiVersion: v1

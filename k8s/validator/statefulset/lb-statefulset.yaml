@@ -68,8 +68,8 @@ spec:
           persistentVolumeClaim:
             claimName: lb-pvc
         - name: validator-keys
-          persistentVolumeClaim:
-            claimName: validator-keys-pvc
+          secret:
+            secretName: validator-keys-secret
         - name: jwt-secret
           secret:
             secretName: geth-jwt-secret

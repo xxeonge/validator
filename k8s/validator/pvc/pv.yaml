@@ -16,7 +16,7 @@ spec:
     - ReadWriteOnce
   storageClassName: local-storage
   hostPath:
-    path: /Users/sia/data-geth  # local path
+    path: /home/staker/data/geth # local path
 
 ---
 apiVersion: v1
@@ -30,7 +30,7 @@ spec:
     - ReadWriteOnce
   storageClassName: local-storage
   hostPath:
-    path: /mnt/data/lb   # local path
+    path: /home/staker/data/lb   # local path
   persistentVolumeReclaimPolicy: Retain
 ---
 
@@ -45,20 +45,6 @@ spec:
     - ReadWriteOnce
   storageClassName: local-storage
   hostPath:
-    path: /mnt/data/lv-pvc   # local path
+    path: /home/staker/data/lv   # local path
   persistentVolumeReclaimPolicy: Retain
----
 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: validator-keys-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: local-storage
-  hostPath:
-    path: /mnt/data/validator-keys  # local path
-  persistentVolumeReclaimPolicy: Retain

@@ -6,6 +6,9 @@ data:
   GRAFFITI: "My Validator"
   # BEACON_ENDPOINTS: "https://ethereum-beacon.blockpi.network/rpc/v1/c3355b1800394ac77408942833bb5040914f46cd"
   BEACON_ENDPOINTS: "http://beacon:5052"
-  FEE_RECIPIENT: "0xd0a761D68bee560F6FadB18cc2254f09cdAEC042"
+  FEE_RECIPIENT: "0xA3AA32DE41B0b09949122A9C215f4dB8E5C4E89d"
   MEV_BOOST_RPC: "http://mev-boost-rpc:18550"
   EXECUTION_ENDPOINT: "http://geth:8551"
+
+
+  

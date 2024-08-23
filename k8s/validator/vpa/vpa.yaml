@@ -1,0 +1,62 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: geth-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: geth
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: geth
+      minAllowed:
+        cpu: 2
+        memory: 2Gi
+      maxAllowed:
+        cpu: 4
+        memory: 4Gi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: lb-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: beacon
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: beacon
+      minAllowed:
+        cpu: 2
+        memory: 3Gi
+      maxAllowed:
+        cpu: 4
+        memory: 14Gi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: lv-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: validator
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: validator
+      minAllowed:
+        cpu: 2
+        memory: 3Gi
+      maxAllowed:
+        cpu: 4
+        memory: 14Gi

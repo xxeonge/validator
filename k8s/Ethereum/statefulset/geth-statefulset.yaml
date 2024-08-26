@@ -29,6 +29,7 @@ spec:
             - geth
           args:
             - --holesky
+            - --port=30303
             - --http
             - --http.addr=0.0.0.0
             - --http.port=8547
@@ -87,7 +88,7 @@ kind: Service
 metadata:
   name: geth
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - name: http
       port: 8547

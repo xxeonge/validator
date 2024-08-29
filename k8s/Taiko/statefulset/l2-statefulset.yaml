@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: l2-execution-engine
+spec:
+  selector:
+    matchLabels:
+      app: l2-execution-engine
+  serviceName: "l2-execution-engine"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: l2-execution-engine
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: l2-execution-engine
+          image: us-docker.pkg.dev/evmchain/images/taiko-geth:sha-5faa71b
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: /data/taiko-geth
+          command: ["/bin/sh", "-c", "--"]
+          args:
+            - |
+              /geth --taiko \
+              --networkid ${CHAIN_ID} \
+              --gcmode archive \
+              --datadir /data/taiko-geth \
+              --metrics \
+              --metrics.expensive \
+              --metrics.addr "0.0.0.0" \
+              --bootnodes ${BOOT_NODES} \
+              --authrpc.addr "0.0.0.0" \
+              --authrpc.vhosts "*" \
+              --http \
+              --http.api debug,eth,net,web3,txpool,taiko \
+              --http.addr "0.0.0.0" \
+              --http.vhosts "*" \
+              --ws \
+              --ws.api debug,eth,net,web3,txpool,taiko \
+              --ws.addr "0.0.0.0" \
+              --ws.origins "*" \
+              --gpo.ignoreprice "100000000" \
+              --port ${PORT_L2_EXECUTION_ENGINE_P2P} \
+              --discovery.port ${PORT_L2_EXECUTION_ENGINE_P2P} \
+              --maxpeers ${MAXPEERS:-50} \
+              --maxpendpeers ${MAXPENDPEERS:-0} \
+              ${GETH_ADDITIONAL_ARGS:-}
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2Gi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+          livenessProbe:
+            tcpSocket:
+              port: 8551
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 2
+          readinessProbe:
+            tcpSocket:
+              port: 8551
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 2
+          volumeMounts:
+            - name: l2-data
+              mountPath: /data/taiko-geth
+      volumes:
+        - name: l2-data
+          persistentVolumeClaim:
+            claimName: l2-execution-engine-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: l2-execution-engine-service
+spec:
+  selector:
+    app: l2-execution-engine
+  ports:
+    - name: http
+      port: 8547
+      targetPort: 8547
+    - name: ws
+      port: 8548
+      targetPort: 8548
+    - name: authrpc
+      port: 8551
+      targetPort: 8551
+    - name: p2p
+      port: 30306
+      targetPort: 30306
+    - name: metrics
+      port: 6060
+      targetPort: 6060

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: l2-execution-engine
+  namespace: default
+spec:
+  serviceName: l2-execution-engine
+  replicas: 1
+  selector:
+    matchLabels:
+      app: l2-execution-engine
+  template:
+    metadata:
+      labels:
+        app: l2-execution-engine
+    spec:
+      containers:
+        - name: l2-execution-engine
+          image: us-docker.pkg.dev/evmchain/images/taiko-geth:sha-5faa71b
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6060
+              name: metrics
+            - containerPort: 8545
+              name: http
+            - containerPort: 8546
+              name: ws
+            - containerPort: 30303
+              name: p2p
+          command:
+            - /bin/sh
+            - -c
+            - |
+              exec geth --taiko --networkid "${CHAIN_ID}" --gcmode archive --datadir /data/taiko-geth --metrics --metrics.expensive --metrics.addr "0.0.0.0" --bootnodes ${BOOT_NODES} --authrpc.addr "0.0.0.0" --authrpc.vhosts "*" --http --http.api debug,eth,net,web3,txpool,taiko --http.addr "0.0.0.0" --http.vhosts "*" --ws --ws.api debug,eth,net,web3,txpool,taiko --ws.addr "0.0.0.0" --ws.origins "*" --gpo.ignoreprice "100000000" --port ${PORT_L2_EXECUTION_ENGINE_P2P} --discovery.port ${PORT_L2_EXECUTION_ENGINE_P2P} --maxpeers ${MAXPEERS:-50} --maxpendpeers ${MAXPENDPEERS:-0} ${GETH_ADDITIONAL_ARGS:-}
+          volumeMounts:
+            - name: l2-execution-engine-data
+              mountPath: /data/taiko-geth
+      volumes:
+        - name: l2-execution-engine-data
+          persistentVolumeClaim:
+            claimName: l2-execution-engine-data-pvc

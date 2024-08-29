@@ -1,0 +1,62 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: l2-execution-enginevpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: l2-execution-engine-vpa
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: l2-execution-engine
+      minAllowed:
+        cpu: 2
+        memory: 2Gi
+      maxAllowed:
+        cpu: 4
+        memory: 4Gi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: taiko-client-prover-relayer-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: taiko-client-prover-relayer
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: taiko-client-prover-relayer
+      minAllowed:
+        cpu: 2
+        memory: 3Gi
+      maxAllowed:
+        cpu: 4
+        memory: 5Gi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: taiko-client-driver-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: taiko-client-driver
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: taiko-client-driver
+      minAllowed:
+        cpu: 2
+        memory: 3Gi
+      maxAllowed:
+        cpu: 4
+        memory: 5Gi

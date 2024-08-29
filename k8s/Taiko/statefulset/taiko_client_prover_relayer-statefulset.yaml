@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: taiko-client-prover-relayer
+  labels:
+    app: taiko-client-prover-relayer
+spec:
+  serviceName: taiko-client-prover-relayer
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taiko-client-prover-relayer
+  template:
+    metadata:
+      labels:
+        app: taiko-client-prover-relayer
+    spec:
+      containers:
+        - name: taiko-client-prover-relayer
+          image: us-docker.pkg.dev/evmchain/images/taiko-client:taiko-client-v0.31.0
+          command: ["/bin/sh", "-c", "/script/start-prover-relayer-hekla.sh"]
+          volumeMounts:
+            - name: script-volume
+              mountPath: /script
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: script-volume
+          configMap:
+            name: script-configmap
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taiko-client-prover-relayer
+spec:
+  type: ClusterIP
+  ports:
+    - port: $(PORT_PROVER_SERVER)
+      targetPort: $(PORT_PROVER_SERVER)
+      name: prover-server
+  selector:
+    app: taiko-client-prover-relayer

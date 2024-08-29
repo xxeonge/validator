@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: taiko-client-driver
+  labels:
+    app: taiko-client-driver
+spec:
+  serviceName: taiko-client-driver
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taiko-client-driver
+  template:
+    metadata:
+      labels:
+        app: taiko-client-driver
+    spec:
+      containers:
+        - name: taiko-client-driver
+          image: us-docker.pkg.dev/evmchain/images/taiko-client:taiko-client-v0.31.0
+          command: ["/bin/sh", "-c", "/script/start-driver.sh"]
+          volumeMounts:
+            - name: l2-execution-engine-data
+              mountPath: /data/taiko-geth
+            - name: script-volume
+              mountPath: /script
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: l2-execution-engine-data
+          persistentVolumeClaim:
+            claimName: l2-execution-engine-pvc
+        - name: script-volume
+          configMap:
+            name: script-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: taiko-client-driver
+spec:
+  type: ClusterIP
+  ports:
+    - port: $(PORT_L2_EXECUTION_ENGINE_HTTP)
+      targetPort: $(PORT_L2_EXECUTION_ENGINE_HTTP)
+      name: http
+  selector:
+    app: taiko-client-driver

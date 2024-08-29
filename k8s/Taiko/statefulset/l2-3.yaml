@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: l2-execution-engine
+  labels:
+    app: l2-execution-engine
+spec:
+  serviceName: l2-execution-engine
+  replicas: 1
+  selector:
+    matchLabels:
+      app: l2-execution-engine
+  template:
+    metadata:
+      labels:
+        app: l2-execution-engine
+    spec:
+      containers:
+        - name: l2-execution-engine
+          image: us-docker.pkg.dev/evmchain/images/taiko-geth:sha-5faa71b
+          args:
+            - --taiko
+            - --networkid $(CHAIN_ID)
+            - --gcmode archive
+            - --datadir /data/taiko-geth
+            - --metrics
+            - --metrics.expensive
+            - --metrics.addr "0.0.0.0"
+            - --bootnodes $(BOOT_NODES)
+            - --authrpc.addr "0.0.0.0"
+            - --authrpc.vhosts "*"
+            - --http
+            - --http.api debug,eth,net,web3,txpool,taiko
+            - --http.addr "0.0.0.0"
+            - --http.vhosts "*"
+            - --ws
+            - --ws.api debug,eth,net,web3,txpool,taiko
+            - --ws.addr "0.0.0.0"
+            - --ws.origins "*"
+            - --gpo.ignoreprice "100000000"
+            - --port $(PORT_L2_EXECUTION_ENGINE_P2P)
+            - --discovery.port $(PORT_L2_EXECUTION_ENGINE_P2P)
+            - --maxpeers $(MAXPEERS)
+            - --maxpendpeers $(MAXPENDPEERS)
+            - $(GETH_ADDITIONAL_ARGS)
+          volumeMounts:
+            - name: l2-execution-engine-data
+              mountPath: /data/taiko-geth
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: $(PORT_L2_EXECUTION_ENGINE_P2P)
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+      volumes:
+        - name: l2-execution-engine-data
+          persistentVolumeClaim:
+            claimName: l2-execution-engine-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: l2-execution-engine-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: l2-execution-engine
+spec:
+  type: ClusterIP
+  ports:
+    - port: $(PORT_L2_EXECUTION_ENGINE_METRICS)
+      targetPort: $(PORT_L2_EXECUTION_ENGINE_METRICS)
+      name: metrics
+    - port: $(PORT_L2_EXECUTION_ENGINE_HTTP)
+      targetPort: $(PORT_L2_EXECUTION_ENGINE_HTTP)
+      name: http
+    - port: $(PORT_L2_EXECUTION_ENGINE_WS)
+      targetPort: $(PORT_L2_EXECUTION_ENGINE_WS)
+      name: ws
+    - port: $(PORT_L2_EXECUTION_ENGINE_P2P)
+      targetPort: $(PORT_L2_EXECUTION_ENGINE_P2P)
+      name: p2p
+  selector:
+    app: l2-execution-engine

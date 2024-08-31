@@ -13,6 +13,26 @@ spec:
       labels:
         app: validator
     spec:
+      # securityContext:
+      #   fsGroup: 1000
+      #   runAsUser: 1000
+      # initContainers: # Init Containers 추가 부분
+      #   - name: init-chown
+      #     image: busybox
+      #     imagePullPolicy: IfNotPresent
+      #     command:
+      #       - sh
+      #       - -c
+      #       - |
+      #         mkdir -p /root/.lighthouse/validator;
+      #         mkdir -p /root/validator_keys;
+      #         chown -R 1000:1000 /root/.lighthouse/validator;
+      #         chown -R 1000:1000 /root/validator_keys;
+          volumeMounts:
+            - name: lighthouse-data
+              mountPath: /root/.lighthouse/validator
+            - name: validator-keys
+              mountPath: /root/validator_keys
       containers:
         - name: validator
           image: sigp/lighthouse:latest-modern

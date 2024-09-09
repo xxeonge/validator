@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: l2-execution-engine-data
+  name: l2-execution-engine-pvc
 spec:
   accessModes:
     - ReadWriteOnce

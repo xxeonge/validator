@@ -4,7 +4,7 @@ updates:
     directory: "/.github/workflows"
     schedule:
       interval: "weekly"
-      day: "thursday"
-      time: "14:35"
+      day: "wednesday"
+      time: "13:35"
     commit-message:
       prefix: "deps"
